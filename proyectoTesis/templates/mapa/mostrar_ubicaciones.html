@@ -1,0 +1,140 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %} 
+    <br>
+    
+    {% if ubicacion %}
+        <h1 class="text-center">Ubicaciones de Usuarios</h1>
+        <p class="visually-hidden" id="latitud">{{ ubicacion.latitud }}</p>
+        <p class="visually-hidden" id="longitud">{{ ubicacion.longitud }}</p>
+        
+        <hr>
+        <h2 class="text-center">Contamos Con Los Siguientes Depositos</h2>
+        <br>    
+        <div class="row" style="margin: 10px;">
+            {% for depo in depositos %}
+                <div class="col-lg-4 align-items-center text-center" >
+                    <svg class="bd-placeholder-img rounded-circle" width="120" height="120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-color)"/></svg>
+                    <h2 class="fw-normal">{{ depo.nombre }}</h2>
+                    <br>
+                </div>
+                
+                {% if forloop.counter|divisibleby:3 and not forloop.last %}
+                    </div><div class="row">
+                {% endif %}
+            {% endfor %}
+        </div><!-- /.row -->
+        <br>
+        <div class="text-center">
+            <h3>Si quieres solicitar un recogedor, entonces selecciona el material que deseas vender</h3>
+
+        </div>
+        <br>
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="border border-warning p-4 d-flex justify-content-center align-items-center" style="width: 50%; border-radius: 5px;">
+                
+                <form method="POST" action="{% url 'solicitud_recoleccion' %}">
+                    {% csrf_token %}
+                    {% for material in materiales %}
+                        <div class="form-check justify-content-center align-items-center">
+                            <input name="materiales" class="form-check-input" type="checkbox" value="{{ material.pk }}">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                {{ material.nombre }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-warning">Solicitar Recogedor</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        
+        
+        <br>
+        <div class="d-flex justify-content-center align-items-center">
+            
+            <button class="btn btn-warning align-items-center" onclick="showPosition()">Ver Depositos Cerca Mapa</button>
+
+        </div>
+        <br>
+        <div id="map" style=" display: none; height: 400px; width: 100%; border-radius: 5%;">
+        
+        </div>
+    {% else %}
+        {% if Mensaje %}
+            <div class="text-center border border-warning">
+                <h1>{{Mensaje}}</h1>
+            </div>
+        {% else %}
+            <p>No hay ubicación disponible para este usuario.</p>
+        {% endif %}
+    {% endif %}
+
+
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZr9hN4xfMJjwwG-o2ieDH3XjZosIdwFg&callback=iniciarMap">
+    </script>
+
+    <script>
+        var x = document.getElementById("map");
+        function showPosition() {
+            // Convierte latitud y longitud a números
+            console.log()
+            var latitud = document.getElementById("latitud").textContent
+            var longitud = document.getElementById("longitud").textContent
+            // Reemplazar comas por puntos para asegurar el formato correcto
+            latitud = latitud.replace(',', '.');
+            longitud = longitud.replace(',', '.');
+            var latitudNumerica = parseFloat(latitud);
+            var longitudNumerica = parseFloat(longitud);
+            x.style.display = "block";
+            iniciarMap(latitudNumerica, longitudNumerica)
+            
+        }
+        
+        function iniciarMap(latitud,longitud){
+            var coord = {lat:latitud ,lng: longitud};
+            var map = new google.maps.Map(document.getElementById('map'),{
+                zoom: 18,
+                center: coord
+            });
+            var iconoPersonalizado = {
+                url: '/proyectoTesis/static/img/casa_icono.png', //proyectoTesis/static/img/casa_icono.png
+                scaledSize: new google.maps.Size(50, 50), 
+                origin: new google.maps.Point(0, 0), 
+                anchor: new google.maps.Point(25, 50) 
+            };
+            var icono_deposito = {
+                url: '/proyectoTesis/static/img/deposito_logo.png', 
+                scaledSize: new google.maps.Size(50, 50), 
+                origin: new google.maps.Point(0, 0), 
+                anchor: new google.maps.Point(25, 50) 
+            };
+            var marker = new google.maps.Marker({
+                position: coord,
+                map: map,
+                icon: iconoPersonalizado,
+                animation: google.maps.Animation.DROP,
+                title: 'Mi Ubicación'
+            });
+            {% for depo in depositos %}
+                latitud = {{depo.latitud}};
+                longitud = {{depo.longitud}};
+                var coord_depositos = {lat:latitud ,lng: longitud};
+                var marker_depositos = new google.maps.Marker({
+                    position: coord_depositos,
+                    map: map,
+                    icon: icono_deposito,
+                    animation: google.maps.Animation.DROP,
+                    title: '{{depo.nombre}}'
+                });
+            {% endfor %}
+            
+        }
+    </script>
+    
+
+
+{% endblock %}

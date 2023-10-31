@@ -1,0 +1,82 @@
+{% extends "index.html" %}
+{% block content %}
+<body>
+    {% if mensaje %}
+        <div class="text-center">
+            <h1>{{mensaje}}</h1>
+        </div>
+        
+    {% else %}
+    <h1 class="text-center">Materiales</h1>
+    <ul>
+
+        {% for chunk in data|slice:"1" %}
+            <div class="row mt-3 ">
+                {% for material in data %}
+                    <div class=" col-md-3">
+                        <div class="shadow-lg p-3 mb-5 bg-body-tertiary rounded card border-danger" style="width: 18rem;">
+                            <div id="foto-{{ material.nombre }}" class="text-wrap d-flex justify-content-center">
+
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">Detalles del material reciclable</h5>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Nombre: {{ material.nombre }}</li>
+                                <li class="list-group-item">Programa: {{ material.precio_por_kilo }}</li>
+                            </ul>
+                            <div class="card-body">
+                                <!-- <form method="post" action="">
+                
+                                    {% csrf_token %}
+                                    
+                                    <div class="form-floating">
+                                        <input type="hidden" class="form-control" id="" value="" placeholder="cedula" name="cedula">
+                                    </div>
+                                    <br>
+                                    <button class="w-100 btn btn-success" type="submit">Ver detalle</button>
+                                </form> -->
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                {% endfor %}
+            </div>
+        {% empty %}
+            <li>No hay estudiantes disponibles.</li>
+        {% endfor %}
+    </ul>
+    
+
+    
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Hacer una solicitud AJAX para obtener la foto del estudiante
+        {% for material in data %}
+            $.ajax({
+                url: "{% url 'obtener_foto_material'  material.nombre %}",
+                dataType: "json",
+                success: function(response) {
+                    // Mostrar la foto en el div correspondiente
+                    var fotoDiv = $('#foto-{{  material.nombre }}');
+                    if (response.foto == null) {
+                        var materian_nombre = "{{  material.nombre }}";
+                        console.log(materian_nombre)
+                        var guardarFotoUrl = "{% url 'guardar_foto' %}";
+                        fotoDiv.html('<div  style="width: 100%; height: auto; padding: 10px; border-radius: 10%;" ><p>No hay foto disponible.</p><br><form method="post" action="' + guardarFotoUrl + '" enctype="multipart/form-data">{% csrf_token %}<input type="file" name="nueva_foto" accept="image/*"><br><input type="hidden" class="form-control" id="{{ form.material.nombre }}" placeholder="nombre" name="nombre" value="'+materian_nombre+'" readonly><br><button class="btn btn-primary" type="submit">Actualizar Foto</button></form></div>');
+
+                    }else{
+                        fotoDiv.html('<img src="' + response.foto + '" alt="imagen del material" style="max-width: 70%; height: auto; padding: 10px; border-radius: 10%;" >');
+                    }
+                }
+            });
+        {% endfor %}
+    </script>
+</body>
+{% endif %}
+{% endblock %}
+</html>
+
+
+

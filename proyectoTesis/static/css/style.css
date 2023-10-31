@@ -1,0 +1,43 @@
+
+.table.table-hover.text-nowrap.import-preview{
+    background-color: white;
+}
+body.theme-lux table.table.table-striped tbody {
+    color: white;
+    background-color: red;
+}
+
+body.theme-lux table.table-hover.text-nowrap.import-preview tbody {
+    color: white;
+    background-color: red;
+}
+
+body.theme-lux .card-body{
+    overflow: auto;
+    height: auto;
+}
+
+body.theme-lux a{
+    color: white;
+}
+
+body.theme-lux table  {
+    background-color: white;
+}
+body.theme-lux .import_link.btn.btn-secondary {
+    color: black;
+}
+body.theme-lux .export_link.btn.btn-secondary {
+    color: black;
+}
+body.theme-lux .main-sidebar.elevation-4.sidebar-dark-primary{
+    background-color: red;
+    color: white;
+}
+body.theme-lux .main-sidebar.elevation-4.sidebar-dark-primary * {
+    color: white;
+}
+
+body.theme-lux .table.table-sm *{
+    color: white;
+}
